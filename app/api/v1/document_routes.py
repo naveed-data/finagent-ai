@@ -10,6 +10,7 @@ from app.schemas.document_schema import DocumentUploadResponse
 from app.schemas.search_schema import SearchResponse
 from app.services.answer_service import AnswerService
 from app.services.document_parser import DocumentParser
+from app.services.memory_service import MemoryService
 
 router = APIRouter(
     prefix="/documents",
@@ -23,6 +24,7 @@ parser = DocumentParser()
 chunker = TextChunker(chunk_size=500, overlap=50)
 vector_store = VectorStore()
 answer_service = AnswerService()
+memory_service = MemoryService()
 
 
 @router.post("/upload", response_model=DocumentUploadResponse)
@@ -74,14 +76,19 @@ async def search_documents(query: str, top_k: int = 3):
 
 @router.get("/ask", response_model=AnswerResponse)
 async def ask_document(question: str, top_k: int = 3):
+    memory_service.add("user", question)
+
     results = vector_store.search(query=question, top_k=top_k)
 
     context = "\n\n".join(result["text"] for result in results)
+    memory_context = memory_service.get_context()
 
     answer = answer_service.generate_answer(
         question=question,
-        context=context,
+        context=context + "\n\nConversation History:\n" + memory_context,
     )
+
+    memory_service.add("assistant", answer)
 
     return {
         "question": question,

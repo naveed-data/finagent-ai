@@ -8,3 +8,5 @@ __pycache__/
 *.log
 datasets/processed/
 data/
+# Chroma Vector Database
+data/chroma/
