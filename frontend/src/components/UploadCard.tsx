@@ -4,6 +4,7 @@ import api from "../services/api";
 function UploadCard() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const uploadFile = async () => {
     if (!file) {
@@ -14,11 +15,15 @@ function UploadCard() {
     const formData = new FormData();
     formData.append("file", file);
 
+    setLoading(true);
+
     try {
       const response = await api.post("/documents/upload", formData);
       setMessage(response.data.message);
     } catch {
       setMessage("Upload failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,9 +40,10 @@ function UploadCard() {
 
       <button
         onClick={uploadFile}
-        className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium"
+        disabled={loading}
+        className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-5 py-3 rounded-lg font-medium"
       >
-        Upload PDF
+        {loading ? "Uploading..." : "Upload PDF"}
       </button>
 
       {message && <p className="mt-4 text-sm text-green-700">{message}</p>}

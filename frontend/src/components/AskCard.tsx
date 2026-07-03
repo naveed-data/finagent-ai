@@ -4,12 +4,15 @@ import api from "../services/api";
 function AskCard() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const askQuestion = async () => {
     if (!question.trim()) {
       setAnswer("Please enter a question.");
       return;
     }
+
+    setLoading(true);
 
     try {
       const response = await api.get("/documents/ask", {
@@ -23,6 +26,8 @@ function AskCard() {
       setAnswer(response.data.answer);
     } catch {
       setAnswer("Failed to get answer. Please check backend server.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,9 +44,10 @@ function AskCard() {
 
       <button
         onClick={askQuestion}
-        className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg font-medium"
+        disabled={loading}
+        className="mt-4 w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white px-5 py-3 rounded-lg font-medium"
       >
-        Ask Question
+        {loading ? "Thinking..." : "Ask Question"}
       </button>
 
       {answer && (
