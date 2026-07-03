@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.api.v1.document_routes import router as document_router
+from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.document_routes import router as document_router
 from app.config.settings import settings
 from app.core.logger import logger
 
@@ -10,10 +11,22 @@ app = FastAPI(
     description="Enterprise Banking Operations Platform powered by Agentic AI",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(
     document_router,
     prefix=settings.api_v1_prefix,
 )
+
 
 @app.on_event("startup")
 def startup_event():
@@ -22,7 +35,6 @@ def startup_event():
 
 @app.get("/")
 def root():
-    logger.info("Root endpoint called")
     return {
         "application": settings.app_name,
         "version": settings.app_version,
@@ -33,5 +45,4 @@ def root():
 
 @app.get("/health")
 def health():
-    logger.info("Health check endpoint called")
     return {"status": "healthy"}
