@@ -16,9 +16,7 @@ class VectorStore:
 
     def add_chunks(self, filename: str, chunks: list) -> int:
         texts = [chunk.text for chunk in chunks]
-
         embeddings = self.embedding_model.encode(texts).tolist()
-
         ids = [str(uuid.uuid4()) for _ in texts]
 
         metadatas = [
@@ -38,3 +36,29 @@ class VectorStore:
         )
 
         return len(texts)
+
+    def search(self, query: str, top_k: int = 3) -> list[dict]:
+        query_embedding = self.embedding_model.encode([query]).tolist()[0]
+
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+        )
+
+        documents = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        distances = results.get("distances", [[]])[0]
+
+        search_results = []
+
+        for document, metadata, distance in zip(documents, metadatas, distances):
+            search_results.append(
+                {
+                    "text": document,
+                    "filename": metadata.get("filename", ""),
+                    "chunk_id": metadata.get("chunk_id", 0),
+                    "distance": distance,
+                }
+            )
+
+        return search_results
