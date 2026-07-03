@@ -3,6 +3,7 @@ import UploadCard from "../components/UploadCard";
 import SearchCard from "../components/SearchCard";
 import AskCard from "../components/AskCard";
 import AnalysisCard from "../components/AnalysisCard";
+import DocumentListCard from "../components/DocumentListCard";
 
 function Dashboard() {
   return (
@@ -16,7 +17,10 @@ function Dashboard() {
           <AskCard />
         </div>
 
-        <AnalysisCard />
+        <div className="space-y-8">
+          <AnalysisCard />
+          <DocumentListCard />
+        </div>
       </main>
     </div>
   );
