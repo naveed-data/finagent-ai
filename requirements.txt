@@ -6,3 +6,5 @@ pydantic-settings
 pypdf
 reportlab
 python-multipart
+chromadb
+sentence-transformers

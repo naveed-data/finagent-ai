@@ -13,5 +13,6 @@ class DocumentUploadResponse(BaseModel):
     path: str
     character_count: int
     chunk_count: int
+    stored_chunks: int
     preview: str
     chunks: list[DocumentChunkResponse]

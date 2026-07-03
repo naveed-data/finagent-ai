@@ -1,11 +1,12 @@
-from app.schemas.document_schema import DocumentUploadResponse
 from pathlib import Path
 import shutil
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
+from app.rag.text_chunker import TextChunker
+from app.rag.vector_store import VectorStore
+from app.schemas.document_schema import DocumentUploadResponse
 from app.services.document_parser import DocumentParser
-from app.rag.text_chunker import TextChunker   # <-- Add this import
 
 router = APIRouter(
     prefix="/documents",
@@ -16,21 +17,17 @@ UPLOAD_DIRECTORY = Path("datasets/raw")
 UPLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
 parser = DocumentParser()
-
-chunker = TextChunker(      # <-- Add this here
-    chunk_size=500,
-    overlap=50
-)
+chunker = TextChunker(chunk_size=500, overlap=50)
+vector_store = VectorStore()
 
 
 @router.post("/upload", response_model=DocumentUploadResponse)
 async def upload_document(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="File name is missing.")
 
     if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(
-            status_code=400,
-            detail="Only PDF files are supported."
-        )
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
     destination = UPLOAD_DIRECTORY / file.filename
 
@@ -38,15 +35,16 @@ async def upload_document(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     extracted_text = parser.extract_text_from_pdf(str(destination))
-
-    chunks = chunker.split_text(extracted_text)   # <-- Add this here
+    chunks = chunker.split_text(extracted_text)
+    stored_chunks = vector_store.add_chunks(file.filename, chunks)
 
     return {
-        "message": "Document uploaded, parsed and chunked successfully.",
+        "message": "Document uploaded, parsed, chunked, and stored successfully.",
         "filename": file.filename,
         "path": str(destination),
         "character_count": len(extracted_text),
         "chunk_count": len(chunks),
+        "stored_chunks": stored_chunks,
         "preview": extracted_text[:500],
         "chunks": [
             {
