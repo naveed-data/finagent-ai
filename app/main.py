@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api.v1.document_routes import router as document_router
 
 from app.config.settings import settings
 from app.core.logger import logger
@@ -9,6 +10,10 @@ app = FastAPI(
     description="Enterprise Banking Operations Platform powered by Agentic AI",
 )
 
+app.include_router(
+    document_router,
+    prefix=settings.api_v1_prefix,
+)
 
 @app.on_event("startup")
 def startup_event():
