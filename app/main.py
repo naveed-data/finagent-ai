@@ -1,16 +1,21 @@
 from fastapi import FastAPI
 
+from app.config.settings import settings
+
 app = FastAPI(
-    title="FinAgent AI",
-    description="Enterprise Banking Operations Platform",
-    version="1.0.0"
+    title=settings.app_name,
+    version=settings.app_version,
+    description="Enterprise Banking Operations Platform powered by Agentic AI",
 )
 
 
 @app.get("/")
-def home():
+def root():
     return {
-        "message": "Welcome to FinAgent AI 🚀"
+        "application": settings.app_name,
+        "version": settings.app_version,
+        "environment": settings.environment,
+        "status": "running",
     }
 
 
