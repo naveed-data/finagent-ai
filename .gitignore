@@ -1,19 +1,10 @@
-# Virtual Environment
+venv/
 .venv/
-
-# Python
 __pycache__/
-*.py[cod]
-
-# Environment Variables
+*.pyc
 .env
-
-# macOS
 .DS_Store
-
-# VS Code
 .vscode/
-
-# Logs
-*.logvenv/
-.venv/
+*.log
+datasets/processed/
+data/
