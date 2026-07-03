@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
-
+from app.services.ollama_service import OllamaService
 from app.rag.text_chunker import TextChunker
 from app.rag.vector_store import VectorStore
 from app.schemas.analysis_schema import DocumentAnalysisResponse
@@ -37,6 +37,7 @@ memory_service = MemoryService()
 loan_risk_service = LoanRiskService()
 compliance_service = ComplianceService()
 summary_service = SummaryService()
+ollama_service = OllamaService()
 supervisor_service = SupervisorService()
 
 
@@ -109,19 +110,46 @@ async def search_documents(query: str, top_k: int = 3, filename: str | None = No
 async def ask_document(
     question: str,
     session_id: str = "default",
-    top_k: int = 3,
+    top_k: int = 5,
     filename: str | None = None,
 ):
     memory_service.add(session_id=session_id, role="user", message=question)
 
-    results = vector_store.search(query=question, top_k=top_k, filename=filename)
+    results = vector_store.search(
+        query=question,
+        top_k=top_k,
+        filename=filename,
+    )
 
     context = "\n\n".join(result["text"] for result in results)
     memory_context = memory_service.get_context(session_id=session_id)
 
-    answer = answer_service.generate_answer(
+    summary = summary_service.summarize(context)
+    risk = loan_risk_service.assess_risk(context)
+    compliance = compliance_service.check_compliance(context)
+
+    structured_context = f"""
+Document Summary:
+{summary}
+
+Risk Assessment:
+{risk}
+
+Compliance Check:
+{compliance}
+"""
+
+    final_context = (
+        context
+        + "\n\nStructured Analysis:\n"
+        + structured_context
+        + "\n\nConversation History:\n"
+        + memory_context
+    )
+
+    answer = ollama_service.generate_answer(
         question=question,
-        context=context + "\n\nConversation History:\n" + memory_context,
+        context=final_context,
     )
 
     memory_service.add(session_id=session_id, role="assistant", message=answer)
