@@ -48,7 +48,7 @@ function DocumentListCard() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow p-6 lg:col-span-3">
+    <div className="bg-white rounded-2xl shadow p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">📁 Document History</h2>
 
@@ -62,6 +62,12 @@ function DocumentListCard() {
       </div>
 
       {message && <p className="mb-4 text-sm text-green-700">{message}</p>}
+
+      {!loading && documents.length === 0 && (
+        <div className="border border-dashed border-gray-300 rounded-xl p-8 text-center text-gray-500">
+          No documents found. Upload a loan application PDF to get started.
+        </div>
+      )}
 
       <div className="space-y-3">
         {documents.map((doc, index) => (
