@@ -1,3 +1,4 @@
+from app.schemas.document_schema import DocumentUploadResponse
 from pathlib import Path
 import shutil
 
@@ -22,7 +23,7 @@ chunker = TextChunker(      # <-- Add this here
 )
 
 
-@router.post("/upload")
+@router.post("/upload", response_model=DocumentUploadResponse)
 async def upload_document(file: UploadFile = File(...)):
 
     if not file.filename.lower().endswith(".pdf"):
