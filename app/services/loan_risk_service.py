@@ -1,16 +1,12 @@
-import re
-
-
 class LoanRiskService:
-    def assess_risk(self, context: str) -> dict:
-        credit_score = self._extract_number(r"Credit Score:\s*(\d+)", context)
-        annual_income = self._extract_money(r"Annual Income:\s*\$?([\d,]+)", context)
-        monthly_debt = self._extract_money(r"Monthly Debt Payments:\s*\$?([\d,]+)", context)
-        down_payment = self._extract_money(r"Down Payment:\s*\$?([\d,]+)", context)
+    def assess_risk(self, fields: dict) -> dict:
+        credit_score = fields.get("credit_score")
+        annual_income = fields.get("annual_income")
+        monthly_debt = fields.get("monthly_debt_payments")
+        down_payment = fields.get("down_payment")
+        attention_required = list(fields.get("missing_documents") or [])
 
         reasons = []
-        attention_required = []
-
         risk_score = 0
 
         if credit_score:
@@ -53,12 +49,6 @@ class LoanRiskService:
                 reasons.append(f"Lower down payment of ${down_payment:,.0f}.")
                 risk_score += 1
 
-        if "Home insurance quote is not yet provided" in context:
-            attention_required.append("Home insurance quote is missing.")
-
-        if "Final property appraisal is pending" in context:
-            attention_required.append("Final property appraisal is pending.")
-
         if attention_required:
             risk_score += 1
 
@@ -78,13 +68,3 @@ class LoanRiskService:
             "attention_required": attention_required,
             "recommendation": recommendation,
         }
-
-    def _extract_number(self, pattern: str, text: str) -> int | None:
-        match = re.search(pattern, text)
-        return int(match.group(1)) if match else None
-
-    def _extract_money(self, pattern: str, text: str) -> float | None:
-        match = re.search(pattern, text)
-        if not match:
-            return None
-        return float(match.group(1).replace(",", ""))

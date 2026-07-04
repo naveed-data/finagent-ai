@@ -10,3 +10,5 @@ datasets/processed/
 data/
 # Chroma Vector Database
 data/chroma/
+# Claude Code local settings
+.claude/
