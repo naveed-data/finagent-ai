@@ -27,6 +27,15 @@ function SearchChatsPanel({ onOpenSession, onRequireAuth }: SearchChatsPanelProp
     toggleSession,
   } = useSessionExpansion();
 
+  const deleteSession = async (sessionId: string) => {
+    try {
+      await api.delete(`/chat-sessions/${sessionId}`);
+      setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
+    } catch {
+      // no-op: session stays in the list if deletion failed
+    }
+  };
+
   const search = async () => {
     if (!query.trim()) return;
 
@@ -114,6 +123,7 @@ function SearchChatsPanel({ onOpenSession, onRequireAuth }: SearchChatsPanelProp
             messagesLoading={messagesLoading}
             onToggleSession={toggleSession}
             onOpenSession={onOpenSession}
+            onDeleteSession={deleteSession}
           />
         </div>
       )}

@@ -2,6 +2,7 @@ export type AuthUser = {
   id: string;
   email: string;
   full_name: string;
+  created_at: string;
 };
 
 const TOKEN_KEY = "finagent_token";
@@ -18,6 +19,10 @@ export function getStoredUser(): AuthUser | null {
 
 export function setSession(token: string, user: AuthUser) {
   localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+export function setStoredUser(user: AuthUser) {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 

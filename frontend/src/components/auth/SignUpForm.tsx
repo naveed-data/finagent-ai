@@ -74,7 +74,7 @@ function SignUpForm({ onSuccess, onNavigateToSignIn }: SignUpFormProps) {
         <button
           onClick={submit}
           disabled={submitting}
-          className="w-full bg-white hover:bg-neutral-200 disabled:bg-neutral-600 text-black py-3 rounded-xl font-semibold"
+          className="w-full bg-white hover:bg-neutral-200 disabled:bg-neutral-600 text-black py-3 rounded-xl font-semibold transition-colors"
         >
           {submitting ? "Creating account..." : "Create Account"}
         </button>
@@ -83,7 +83,7 @@ function SignUpForm({ onSuccess, onNavigateToSignIn }: SignUpFormProps) {
           Already have an account?{" "}
           <button
             onClick={onNavigateToSignIn}
-            className="text-blue-400 font-medium hover:underline"
+            className="text-purple-400 font-medium hover:underline"
           >
             Sign in
           </button>

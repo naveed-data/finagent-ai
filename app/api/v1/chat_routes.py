@@ -44,3 +44,21 @@ async def get_chat_session(
         )
 
     return {"session_id": session_id, "messages": messages}
+
+
+@router.delete("/{session_id}")
+async def delete_chat_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+):
+    deleted_count = chat_history_service.delete_session(
+        session_id, user_id=current_user.id
+    )
+
+    if not deleted_count:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No chat history found for session: {session_id}",
+        )
+
+    return {"session_id": session_id, "deleted_messages": deleted_count}

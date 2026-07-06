@@ -5,7 +5,7 @@ import ChatHistoryPanel from "../components/chat/ChatHistoryPanel";
 import SearchChatsPanel from "../components/chat/SearchChatsPanel";
 import AnalysisPanel from "../components/analysis/AnalysisPanel";
 import RecentDocuments from "../components/documents/RecentDocuments";
-import Card from "../components/common/Card";
+import ProfileSettingsPanel from "../components/settings/ProfileSettingsPanel";
 import AuthModal from "../components/auth/AuthModal";
 
 function Dashboard() {
@@ -81,14 +81,7 @@ function Dashboard() {
     if (activeView === "settings") {
       return (
         <div className="p-6">
-          <Card title="⚙️ Settings" subtitle="Manage application preferences.">
-            <div className="space-y-4 text-sm text-neutral-300">
-              <p>Model: Ollama llama3.2:3b</p>
-              <p>Vector Database: ChromaDB</p>
-              <p>Backend: FastAPI</p>
-              <p>Status: Local Development</p>
-            </div>
-          </Card>
+          <ProfileSettingsPanel onRequireAuth={() => setAuthModal("signin")} />
         </div>
       );
     }

@@ -18,7 +18,7 @@ function Sidebar({ activeView, onViewChange, onOpenAuth }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-72 bg-black text-neutral-200 min-h-screen hidden xl:flex flex-col border-r border-neutral-900">
+    <aside className="w-72 bg-black text-neutral-200 h-screen hidden xl:flex flex-col border-r border-neutral-900 overflow-y-auto">
       <div className="px-5 py-5">
         <h1 className="text-lg font-semibold text-white">🏦 FinAgent AI</h1>
         <p className="text-xs text-neutral-500 mt-0.5">

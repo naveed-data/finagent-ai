@@ -246,7 +246,7 @@ async def ask_document(
     context = "\n\n".join(result["text"] for result in results)
     memory_context = memory_service.get_context(session_id=session_id)
 
-    fields = extraction_service.extract_loan_fields(context)
+    fields = await extraction_service.extract_loan_fields(context)
     summary = summary_service.summarize(fields)
     risk = loan_risk_service.assess_risk(fields)
     compliance = compliance_service.check_compliance(fields)
@@ -270,7 +270,7 @@ Compliance Check:
         + memory_context
     )
 
-    answer = ollama_service.generate_answer(
+    answer = await ollama_service.generate_answer(
         question=question,
         context=final_context,
     )
@@ -309,7 +309,7 @@ async def assess_loan_risk(
     )
     context = "\n\n".join(result["text"] for result in results)
 
-    fields = extraction_service.extract_loan_fields(context)
+    fields = await extraction_service.extract_loan_fields(context)
     assessment = loan_risk_service.assess_risk(fields)
 
     return {
@@ -335,7 +335,7 @@ async def check_document_compliance(
     )
     context = "\n\n".join(result["text"] for result in results)
 
-    fields = extraction_service.extract_loan_fields(context)
+    fields = await extraction_service.extract_loan_fields(context)
     compliance = compliance_service.check_compliance(fields)
 
     return {
@@ -357,7 +357,7 @@ async def summarize_document(
     )
     context = "\n\n".join(result["text"] for result in results)
 
-    fields = extraction_service.extract_loan_fields(context)
+    fields = await extraction_service.extract_loan_fields(context)
     summary = summary_service.summarize(fields)
 
     return {
@@ -388,7 +388,7 @@ async def analyze_document(
     )
     context = "\n\n".join(result["text"] for result in results)
 
-    fields = extraction_service.extract_loan_fields(context)
+    fields = await extraction_service.extract_loan_fields(context)
     summary = summary_service.summarize(fields)
     risk = loan_risk_service.assess_risk(fields)
     compliance = compliance_service.check_compliance(fields)

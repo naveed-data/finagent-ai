@@ -4,215 +4,177 @@
 
 # Enterprise Banking Document Intelligence Platform
 
-An AI-powered Retrieval-Augmented Generation (RAG) platform for analyzing banking and loan documents using semantic search, vector databases, and intelligent document analysis.
+A full-stack, multi-tenant AI platform for loan document intelligence — customers upload or manually enter a loan application, then ask an AI analyst about approval odds, risk, compliance, and rates, grounded in both their own document and the bank's real policies via Retrieval-Augmented Generation (RAG).
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Framework-009688?style=for-the-badge&logo=fastapi)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-Frontend-3178C6?style=for-the-badge&logo=typescript)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=for-the-badge&logo=postgresql)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-VectorDB-orange?style=for-the-badge)
-![Sentence Transformers](https://img.shields.io/badge/SentenceTransformers-BGE-green?style=for-the-badge)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)
 
 </div>
 
 ---
 
+# 🌐 Live Demo
+
+Deployment is in progress. A live link will be added here once it's up.
+
+---
+
 # 📖 Overview
 
-FinAgent AI is an enterprise-style banking document intelligence platform built using Retrieval-Augmented Generation (RAG). It enables users to upload banking documents, perform semantic search, ask contextual questions, generate executive summaries, assess loan risk, perform compliance checks, and produce consolidated banking analysis through a modular FastAPI architecture.
+FinAgent AI started as a Retrieval-Augmented Generation (RAG) service for banking documents and has grown into a full-stack, multi-tenant application: a React/TypeScript dashboard on top of a FastAPI backend, with real authentication, per-user data isolation, persistent chat history, and an AI analyst that grounds its answers in both the customer's own application and the bank's actual rate sheets, KYC rules, and underwriting guidelines.
 
-The application uses local embeddings with **BAAI/bge-small-en-v1.5** and **ChromaDB** for semantic retrieval, making it cost-effective without relying on paid embedding APIs.
+Every account only ever sees its own documents and conversations — enforced at the database and vector-store level, not just hidden in the UI. Embeddings run locally via **BAAI/bge-small-en-v1.5** and **ChromaDB**, and the LLM runs locally via **Ollama**, so there's no per-request API cost.
 
 ---
 
 # ✨ Features
 
-## 📄 Document Processing
+## 🔐 Authentication & Multi-Tenancy
 
-- Upload PDF loan applications
-- Automatic PDF text extraction
-- Intelligent text chunking
-- Local embedding generation
-- ChromaDB vector indexing
-- Multi-document support
+- Email/password signup and login (JWT, bcrypt-hashed passwords)
+- Every document, chat session, and message is scoped to the signed-in account — enforced server-side, not just hidden in the UI
+- Profile settings: edit display name, change password
+- Sessions expire automatically and prompt re-login instead of failing silently
 
----
+## 📄 Getting an Application In
 
-## 🔍 Semantic Search
-
-- Vector similarity search
-- Context-aware retrieval
-- Metadata filtering
-- Source attribution
-
----
+- Upload a PDF loan application, or fill out a manual entry form — no PDF required
+- LLM-based structured field extraction (applicant, income, credit score, loan type, DTI inputs, etc.), with a regex fallback if the model output isn't parseable
+- Automatic text chunking and local embedding generation into ChromaDB
 
 ## 💬 Conversational AI
 
-- Banking document Q&A
-- Session-based conversation memory
-- Context-aware responses
-- Source-backed answers
+- Ask questions about your own application in plain language, answered only from what's actually in your document
+- Ask about bank policy — APR by credit tier, KYC requirements, DTI limits — grounded in real seeded policy documents via RAG, kept completely separate from any one customer's application data
+- Voice input: press-to-talk with live transcription, keeps listening until you stop it (never cuts you off), then asks you to confirm or discard before sending
+- Session-based conversation memory with source-backed answers
 
----
+## 🗂 Chat History & Document Management
+
+- Every conversation is saved, searchable by keyword, resumable, and deletable
+- Uploaded documents are listed, downloadable, and deletable per account
 
 ## 🏦 Banking Intelligence
 
-### 📋 Document Summary
-
-Generate structured summaries including:
-
-- Applicant Name
-- Employer
-- Annual Income
-- Credit Score
-- Loan Type
-- Requested Loan Amount
-
----
-
-### 📈 Loan Risk Assessment
-
-Automatically evaluates:
-
-- Credit Score
-- Annual Income
-- Debt-to-Income Ratio
-- Down Payment
-- Missing Documentation
-
-Provides:
-
-- Overall Risk
-- Risk Reasons
-- Attention Required
-- Recommendation
-
----
-
-### ✅ Compliance Check
-
-Performs:
-
-- KYC completeness check
-- Missing document detection
-- Compliance observations
-- Required documentation review
-
----
-
-### 🧠 Supervisor Analysis
-
-Combines:
-
-- Document Summary
-- Loan Risk Assessment
-- Compliance Review
-
-Produces a consolidated executive banking report.
+- **Document Summary** — applicant, employer, income, credit score, loan type, requested amount
+- **Loan Risk Assessment** — credit score, income, DTI, down payment, missing documentation, with an overall risk rating and recommendation
+- **Compliance Check** — KYC completeness, missing documents, compliance notes
+- **Executive Analysis** — summary + risk + compliance combined into one report
 
 ---
 
 # 🏗 System Architecture
 
 ```text
-                           FinAgent AI
-
-                    ┌──────────────────┐
-                    │   Upload PDF     │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    PDF Text Extraction
-                             │
-                             ▼
-                     Intelligent Chunking
-                             │
-                             ▼
-               BGE Embedding Generation
-                             │
-                             ▼
-                        ChromaDB
-                             │
-          ┌──────────────────┼─────────────────┐
-          ▼                  ▼                 ▼
-   Semantic Search      AI Retrieval     Document Manager
-          │
-          ▼
-     Banking Intelligence Layer
-          │
- ┌────────┼────────┬──────────────┐
- ▼        ▼        ▼              ▼
-Summary  Risk  Compliance      Q&A Service
- Agent   Agent     Agent
-          │
-          ▼
-    Supervisor Agent
-          │
-          ▼
- Executive Banking Report
+                        React / TypeScript Dashboard
+                                    │
+                            JWT-authenticated API
+                                    ▼
+                              FastAPI Backend
+                    ┌───────────────┼────────────────┐
+                    ▼               ▼                ▼
+              PostgreSQL       ChromaDB          Ollama (LLM)
+           (users, chat      (per-user doc      (extraction +
+            history)          embeddings +       answers)
+                               shared policy
+                               documents)
+                    │
+                    ▼
+          Banking Intelligence Layer
+    ┌───────────┬───────────┬─────────────┐
+    ▼           ▼           ▼             ▼
+ Summary      Risk      Compliance     Q&A / Chat
+ Service     Service     Service        Service
+    └───────────┴───────────┴─────────────┘
+                    ▼
+          Executive Banking Report
 ```
 
 ---
 
 # ⚙ Tech Stack
 
-| Category             | Technology             |
-| -------------------- | ---------------------- |
-| Programming Language | Python 3.12            |
-| Backend Framework    | FastAPI                |
-| API Validation       | Pydantic               |
-| PDF Processing       | PyPDF                  |
-| Embeddings           | BAAI/bge-small-en-v1.5 |
-| ML Library           | Sentence Transformers  |
-| Vector Database      | ChromaDB               |
-| Server               | Uvicorn                |
-| Version Control      | Git & GitHub           |
+| Category              | Technology                        |
+| --------------------- | ---------------------------------- |
+| Backend Framework     | FastAPI (async)                    |
+| Frontend              | React 19 + TypeScript + Vite       |
+| Styling               | Tailwind CSS v4                    |
+| Relational Database   | PostgreSQL + SQLAlchemy            |
+| Authentication        | JWT (PyJWT) + bcrypt               |
+| Vector Database       | ChromaDB                           |
+| Embeddings            | BAAI/bge-small-en-v1.5 (Sentence Transformers) |
+| LLM                   | Ollama (llama3.2:3b), async client |
+| PDF Processing        | pypdf                              |
+| API Validation        | Pydantic                           |
+| Server                | Uvicorn                            |
+| Version Control       | Git & GitHub                       |
 
 ---
 
 # 📁 Project Structure
 
 ```text
-FinAgent-AI/
+finagent-ai/
 │
 ├── app/
-│   ├── api/
-│   │   └── v1/
-│   │       └── document_routes.py
+│   ├── api/v1/
+│   │   ├── auth_routes.py
+│   │   ├── chat_routes.py
+│   │   └── document_routes.py
 │   │
 │   ├── config/
+│   ├── database/
+│   │   └── session.py
+│   │
+│   ├── models/
+│   │   ├── user.py
+│   │   └── chat.py
 │   │
 │   ├── rag/
 │   │   ├── text_chunker.py
 │   │   └── vector_store.py
 │   │
 │   ├── schemas/
-│   │   ├── answer_schema.py
-│   │   ├── analysis_schema.py
-│   │   ├── compliance_schema.py
-│   │   ├── document_management_schema.py
-│   │   ├── document_schema.py
-│   │   ├── risk_schema.py
-│   │   ├── search_schema.py
-│   │   └── summary_schema.py
-│   │
 │   ├── services/
-│   │   ├── answer_service.py
-│   │   ├── compliance_service.py
+│   │   ├── auth_service.py
+│   │   ├── chat_history_service.py
+│   │   ├── document_extraction_service.py
 │   │   ├── document_parser.py
+│   │   ├── ollama_service.py
 │   │   ├── loan_risk_service.py
-│   │   ├── memory_service.py
+│   │   ├── compliance_service.py
 │   │   ├── summary_service.py
 │   │   └── supervisor_service.py
 │   │
 │   └── main.py
 │
-├── datasets/
-│   └── raw/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── auth/
+│   │   │   ├── chat/
+│   │   │   ├── documents/
+│   │   │   └── settings/
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx
+│   │   ├── layout/
+│   │   │   ├── MainLayout.tsx
+│   │   │   └── Sidebar.tsx
+│   │   ├── pages/
+│   │   │   └── Dashboard.tsx
+│   │   └── services/
+│   │       ├── api.ts
+│   │       └── authStorage.ts
+│   └── package.json
 │
-├── data/
-│   └── chroma/
-│
+├── datasets/raw/          # uploaded PDFs
+├── data/chroma/           # ChromaDB persistent store
 ├── requirements.txt
 ├── Dockerfile
 ├── .env
@@ -223,128 +185,112 @@ FinAgent-AI/
 
 # 🚀 Installation
 
-## Clone Repository
+## Prerequisites
+
+- Python 3.12+
+- Node.js 18+
+- PostgreSQL (running locally or reachable via `DATABASE_URL`)
+- [Ollama](https://ollama.com) installed, with a model pulled: `ollama pull llama3.2:3b`
+
+## Backend
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/FinAgent-AI.git
+git clone https://github.com/YOUR_USERNAME/finagent-ai.git
+cd finagent-ai
 
-cd FinAgent-AI
-```
-
----
-
-## Create Virtual Environment
-
-### Windows
-
-```bash
 python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
 
-venv\Scripts\activate
-```
-
-### macOS / Linux
-
-```bash
-python -m venv venv
-
-source venv/bin/activate
-```
-
----
-
-## Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
----
-
-## Configure Environment
-
-Create a `.env` file in the project root.
-
-Example:
+Create a `.env` file in the project root:
 
 ```env
+APP_NAME=FinAgent AI
+APP_VERSION=1.0.0
+ENVIRONMENT=development
+DEBUG=true
+
+API_V1_PREFIX=/api/v1
+HOST=127.0.0.1
+PORT=8002
+
+DATABASE_URL=postgresql://user:password@localhost:5432/finagent
+
+VECTOR_DB=chroma
 CHROMA_DB_PATH=data/chroma
+
+LOG_LEVEL=info
+
+SECRET_KEY=change-this-to-a-random-secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
----
-
-## Run Application
+Run the backend:
 
 ```bash
 uvicorn app.main:app --reload --port 8002
 ```
 
-Swagger UI:
+Swagger UI: `http://127.0.0.1:8002/docs`
 
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-http://127.0.0.1:8002/docs
-```
+
+Runs at `http://localhost:5173` by default.
 
 ---
 
 # 📡 API Endpoints
 
-## Document Management
+## Auth
 
-| Method | Endpoint                       | Description     |
-| ------ | ------------------------------ | --------------- |
-| POST   | `/api/v1/documents/upload`     | Upload PDF      |
-| GET    | `/api/v1/documents`            | List Documents  |
-| DELETE | `/api/v1/documents/{filename}` | Delete Document |
+| Method | Endpoint                     | Description                     |
+| ------ | ----------------------------- | -------------------------------- |
+| POST   | `/api/v1/auth/signup`         | Create account, returns JWT      |
+| POST   | `/api/v1/auth/login`          | Log in, returns JWT              |
+| GET    | `/api/v1/auth/me`             | Get current user profile        |
+| PATCH  | `/api/v1/auth/me`             | Update full name                 |
+| POST   | `/api/v1/auth/change-password`| Change password                  |
 
----
+## Chat History
 
-## AI Retrieval
+| Method | Endpoint                          | Description                  |
+| ------ | ---------------------------------- | ----------------------------- |
+| GET    | `/api/v1/chat-sessions`            | List your chat sessions       |
+| GET    | `/api/v1/chat-sessions/search`     | Search your chat history      |
+| GET    | `/api/v1/chat-sessions/{id}`       | Get one session's messages    |
+| DELETE | `/api/v1/chat-sessions/{id}`       | Delete a chat session         |
 
-| Method | Endpoint                   | Description     |
-| ------ | -------------------------- | --------------- |
-| GET    | `/api/v1/documents/search` | Semantic Search |
-| GET    | `/api/v1/documents/ask`    | Ask Questions   |
+## Documents
 
----
+| Method | Endpoint                             | Description                    |
+| ------ | -------------------------------------- | -------------------------------- |
+| POST   | `/api/v1/documents/upload`           | Upload a PDF                    |
+| POST   | `/api/v1/documents/manual-entry`     | Submit a loan application form  |
+| GET    | `/api/v1/documents`                  | List your documents             |
+| GET    | `/api/v1/documents/{filename}/download` | Download a document          |
+| DELETE | `/api/v1/documents/{filename}`       | Delete a document                |
+| GET    | `/api/v1/documents/search`           | Semantic search                  |
+| GET    | `/api/v1/documents/ask`              | Ask a question (chat)            |
 
 ## Banking Intelligence
 
-| Method | Endpoint                             | Description                |
-| ------ | ------------------------------------ | -------------------------- |
-| GET    | `/api/v1/documents/summary`          | Document Summary           |
-| GET    | `/api/v1/documents/risk-assessment`  | Loan Risk Assessment       |
-| GET    | `/api/v1/documents/compliance-check` | Compliance Analysis        |
-| GET    | `/api/v1/documents/analyze`          | Executive Banking Analysis |
+| Method | Endpoint                             | Description                  |
+| ------ | -------------------------------------- | ------------------------------ |
+| GET    | `/api/v1/documents/summary`          | Document summary                |
+| GET    | `/api/v1/documents/risk-assessment`  | Loan risk assessment             |
+| GET    | `/api/v1/documents/compliance-check` | Compliance analysis              |
+| GET    | `/api/v1/documents/analyze`          | Executive banking analysis       |
 
----
-
-# 📊 Example Workflow
-
-```text
-Upload Loan PDF
-        │
-        ▼
-Extract Text
-        │
-        ▼
-Chunk Document
-        │
-        ▼
-Generate Embeddings
-        │
-        ▼
-Store in ChromaDB
-        │
-        ▼
-Semantic Search
-        │
-        ▼
-Banking Intelligence Services
-        │
-        ▼
-Executive Banking Analysis
-```
+All endpoints above require a Bearer JWT except signup/login.
 
 ---
 
@@ -384,33 +330,34 @@ Executive Banking Analysis
 
 # 🎯 Skills Demonstrated
 
-- Retrieval-Augmented Generation (RAG)
-- FastAPI Development
-- REST API Design
-- Vector Databases
-- Semantic Search
-- PDF Processing
-- Sentence Transformers
-- ChromaDB
-- Banking Document Intelligence
-- AI Service Architecture
-- Session Management
-- Modular Backend Development
+- Full-stack development (FastAPI + React/TypeScript)
+- Retrieval-Augmented Generation (RAG) with per-tenant and shared-knowledge retrieval scoping
+- JWT authentication, password hashing, and multi-tenant data isolation
+- Relational + vector database design (PostgreSQL, ChromaDB)
+- Async backend design (non-blocking LLM calls)
+- LLM-based structured data extraction with deterministic fallback
+- REST API design
+- PDF processing and semantic search
+- Voice input via the Web Speech API
+- Banking domain modeling (risk, compliance, KYC, DTI, rate tiers)
+
+---
+
+# ⚠️ Known Limitations
+
+- **No role-based permission system yet.** Every account currently has identical access — there is no distinction between a customer and a bank employee/admin account. Any authenticated user can technically call the policy-document upload endpoint, even though the customer-facing UI only exposes application uploads.
+- **APR figures are not authoritative.** APR answers are generated by the LLM from retrieved rate-sheet text, not computed by a deterministic pricing engine. Treat them as an illustrative estimate, not a compliant, auditable rate calculation suitable for real lending decisions.
 
 ---
 
 # 🔮 Future Enhancements
 
-- Ollama integration for local LLM inference
-- LangChain or LlamaIndex retrieval pipeline
-- React dashboard
-- JWT authentication
-- Docker Compose deployment
-- GitHub Actions CI/CD
-- Unit and integration tests
+- Customer vs. bank-employee account roles
+- Deterministic APR/pricing calculation engine (real code, not LLM-generated)
 - Streaming AI responses
-- Persistent conversation history
-- Advanced banking analytics
+- Unit and integration tests
+- GitHub Actions CI/CD
+- Demo/guest login for quick recruiter access without signing up
 
 ---
 

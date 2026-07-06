@@ -4,6 +4,7 @@ import api from "../../services/api";
 type LoanApplicationFormProps = {
   onClose: () => void;
   onSubmitted: (message: string, filename: string) => void;
+  onRequireAuth: () => void;
 };
 
 const initialState = {
@@ -25,7 +26,11 @@ const initialState = {
   propertyAppraisalCompleted: false,
 };
 
-function LoanApplicationForm({ onClose, onSubmitted }: LoanApplicationFormProps) {
+function LoanApplicationForm({
+  onClose,
+  onSubmitted,
+  onRequireAuth,
+}: LoanApplicationFormProps) {
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -79,8 +84,13 @@ function LoanApplicationForm({ onClose, onSubmitted }: LoanApplicationFormProps)
           } stored as "${response.data.filename}"). Ask a question or generate an analysis.`,
         response.data.filename
       );
-    } catch {
-      setError("Failed to submit application. Please check the backend server.");
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        setError("Your session has expired. Please sign in again.");
+        onRequireAuth();
+      } else {
+        setError("Failed to submit application. Please check the backend server.");
+      }
     } finally {
       setSubmitting(false);
     }

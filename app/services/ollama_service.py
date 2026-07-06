@@ -4,9 +4,10 @@ import ollama
 class OllamaService:
     def __init__(self, model_name: str = "llama3.2:3b"):
         self.model_name = model_name
+        self._client = ollama.AsyncClient()
 
-    def generate_raw(self, prompt: str) -> str:
-        response = ollama.chat(
+    async def generate_raw(self, prompt: str) -> str:
+        response = await self._client.chat(
             model=self.model_name,
             messages=[
                 {
@@ -18,7 +19,7 @@ class OllamaService:
 
         return response["message"]["content"]
 
-    def generate_answer(self, question: str, context: str) -> str:
+    async def generate_answer(self, question: str, context: str) -> str:
         prompt = f"""
 You are FinAgent AI, a professional banking document intelligence assistant.
 
@@ -41,4 +42,4 @@ User Question:
 Answer:
 """
 
-        return self.generate_raw(prompt)
+        return await self.generate_raw(prompt)

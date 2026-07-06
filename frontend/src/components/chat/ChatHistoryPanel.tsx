@@ -25,6 +25,15 @@ function ChatHistoryPanel({ onOpenSession, onRequireAuth }: ChatHistoryPanelProp
     toggleSession,
   } = useSessionExpansion();
 
+  const deleteSession = async (sessionId: string) => {
+    try {
+      await api.delete(`/chat-sessions/${sessionId}`);
+      setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
+    } catch {
+      // no-op: session stays in the list if deletion failed
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -107,6 +116,7 @@ function ChatHistoryPanel({ onOpenSession, onRequireAuth }: ChatHistoryPanelProp
           messagesLoading={messagesLoading}
           onToggleSession={toggleSession}
           onOpenSession={onOpenSession}
+          onDeleteSession={deleteSession}
         />
       )}
     </Card>

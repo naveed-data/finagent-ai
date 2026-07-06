@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from app.database.session import SessionLocal
 from app.models.chat import ChatMessage
@@ -101,3 +101,14 @@ class ChatHistoryService:
         all_sessions = self.list_sessions(user_id=user_id)
         matching_ids = set(matching_session_ids)
         return [s for s in all_sessions if s["session_id"] in matching_ids]
+
+    def delete_session(self, session_id: str, user_id: str | None = None) -> int:
+        with SessionLocal() as db:
+            result = db.execute(
+                delete(ChatMessage).where(
+                    ChatMessage.session_id == session_id,
+                    ChatMessage.user_id == user_id,
+                )
+            )
+            db.commit()
+            return result.rowcount

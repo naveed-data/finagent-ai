@@ -58,6 +58,7 @@ type ChatSessionListProps = {
   messagesLoading: boolean;
   onToggleSession: (sessionId: string) => void;
   onOpenSession: (sessionId: string) => void;
+  onDeleteSession: (sessionId: string) => void;
 };
 
 function ChatSessionList({
@@ -67,6 +68,7 @@ function ChatSessionList({
   messagesLoading,
   onToggleSession,
   onOpenSession,
+  onDeleteSession,
 }: ChatSessionListProps) {
   return (
     <div className="space-y-3">
@@ -105,6 +107,18 @@ function ChatSessionList({
                 className="text-xs font-medium text-purple-400 hover:underline whitespace-nowrap"
               >
                 Continue chat →
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm("Delete this conversation? This cannot be undone.")) {
+                    onDeleteSession(session.session_id);
+                  }
+                }}
+                title="Delete conversation"
+                className="text-neutral-500 hover:text-red-400 text-sm"
+              >
+                🗑️
               </button>
               <span className="text-neutral-500 text-sm">
                 {expandedSessionId === session.session_id ? "▲" : "▼"}

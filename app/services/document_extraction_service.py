@@ -38,17 +38,17 @@ class DocumentExtractionService:
     def __init__(self, ollama_service: OllamaService | None = None):
         self.ollama_service = ollama_service or OllamaService()
 
-    def extract_loan_fields(self, context: str) -> dict:
-        fields = self._extract_with_llm(context)
+    async def extract_loan_fields(self, context: str) -> dict:
+        fields = await self._extract_with_llm(context)
         if fields is not None:
             return fields
         return self._extract_with_regex(context)
 
-    def _extract_with_llm(self, context: str) -> dict | None:
+    async def _extract_with_llm(self, context: str) -> dict | None:
         prompt = EXTRACTION_PROMPT.format(context=context)
 
         try:
-            raw = self.ollama_service.generate_raw(prompt)
+            raw = await self.ollama_service.generate_raw(prompt)
         except Exception:
             return None
 

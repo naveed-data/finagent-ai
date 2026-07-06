@@ -1,10 +1,17 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import api from "../services/api";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import api, { SESSION_EXPIRED_EVENT } from "../services/api";
 import {
   type AuthUser,
   clearSession,
   getStoredUser,
   setSession,
+  setStoredUser,
 } from "../services/authStorage";
 
 type AuthContextValue = {
@@ -13,6 +20,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>;
   signup: (fullName: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (user: AuthUser) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -41,9 +49,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (updated: AuthUser) => {
+    setStoredUser(updated);
+    setUser(updated);
+  };
+
+  useEffect(() => {
+    const handleSessionExpired = () => setUser(null);
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () =>
+      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, login, signup, logout }}
+      value={{ user, isAuthenticated: !!user, login, signup, logout, updateUser }}
     >
       {children}
     </AuthContext.Provider>

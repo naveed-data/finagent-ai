@@ -14,15 +14,15 @@ function MainLayout({
   onOpenAuth,
 }: MainLayoutProps) {
   return (
-    <div className="min-h-screen bg-black flex">
+    <div className="h-screen bg-black flex overflow-hidden">
       <Sidebar
         activeView={activeView}
         onViewChange={onViewChange}
         onOpenAuth={onOpenAuth}
       />
 
-      <div className="flex-1 min-w-0">
-        <main className="min-h-screen">{children}</main>
+      <div className="flex-1 min-w-0 h-screen overflow-y-auto app-shell-bg">
+        <main>{children}</main>
       </div>
     </div>
   );
