@@ -19,12 +19,6 @@ A full-stack, multi-tenant AI platform for loan document intelligence — custom
 
 ---
 
-# 🌐 Live Demo
-
-Deployment is in progress. A live link will be added here once it's up.
-
----
-
 # 📖 Overview
 
 FinAgent AI started as a Retrieval-Augmented Generation (RAG) service for banking documents and has grown into a full-stack, multi-tenant application: a React/TypeScript dashboard on top of a FastAPI backend, with real authentication, per-user data isolation, persistent chat history, and an AI analyst that grounds its answers in both the customer's own application and the bank's actual rate sheets, KYC rules, and underwriting guidelines.
@@ -100,20 +94,20 @@ Every account only ever sees its own documents and conversations — enforced at
 
 # ⚙ Tech Stack
 
-| Category              | Technology                        |
-| --------------------- | ---------------------------------- |
-| Backend Framework     | FastAPI (async)                    |
-| Frontend              | React 19 + TypeScript + Vite       |
-| Styling               | Tailwind CSS v4                    |
-| Relational Database   | PostgreSQL + SQLAlchemy            |
-| Authentication        | JWT (PyJWT) + bcrypt               |
-| Vector Database       | ChromaDB                           |
-| Embeddings            | BAAI/bge-small-en-v1.5 (Sentence Transformers) |
-| LLM                   | Ollama (llama3.2:3b), async client |
-| PDF Processing        | pypdf                              |
-| API Validation        | Pydantic                           |
-| Server                | Uvicorn                            |
-| Version Control       | Git & GitHub                       |
+| Category            | Technology                                     |
+| ------------------- | ---------------------------------------------- |
+| Backend Framework   | FastAPI (async)                                |
+| Frontend            | React 19 + TypeScript + Vite                   |
+| Styling             | Tailwind CSS v4                                |
+| Relational Database | PostgreSQL + SQLAlchemy                        |
+| Authentication      | JWT (PyJWT) + bcrypt                           |
+| Vector Database     | ChromaDB                                       |
+| Embeddings          | BAAI/bge-small-en-v1.5 (Sentence Transformers) |
+| LLM                 | Ollama (llama3.2:3b), async client             |
+| PDF Processing      | pypdf                                          |
+| API Validation      | Pydantic                                       |
+| Server              | Uvicorn                                        |
+| Version Control     | Git & GitHub                                   |
 
 ---
 
@@ -252,43 +246,43 @@ Runs at `http://localhost:5173` by default.
 
 ## Auth
 
-| Method | Endpoint                     | Description                     |
-| ------ | ----------------------------- | -------------------------------- |
-| POST   | `/api/v1/auth/signup`         | Create account, returns JWT      |
-| POST   | `/api/v1/auth/login`          | Log in, returns JWT              |
-| GET    | `/api/v1/auth/me`             | Get current user profile        |
-| PATCH  | `/api/v1/auth/me`             | Update full name                 |
-| POST   | `/api/v1/auth/change-password`| Change password                  |
+| Method | Endpoint                       | Description                 |
+| ------ | ------------------------------ | --------------------------- |
+| POST   | `/api/v1/auth/signup`          | Create account, returns JWT |
+| POST   | `/api/v1/auth/login`           | Log in, returns JWT         |
+| GET    | `/api/v1/auth/me`              | Get current user profile    |
+| PATCH  | `/api/v1/auth/me`              | Update full name            |
+| POST   | `/api/v1/auth/change-password` | Change password             |
 
 ## Chat History
 
-| Method | Endpoint                          | Description                  |
-| ------ | ---------------------------------- | ----------------------------- |
-| GET    | `/api/v1/chat-sessions`            | List your chat sessions       |
-| GET    | `/api/v1/chat-sessions/search`     | Search your chat history      |
-| GET    | `/api/v1/chat-sessions/{id}`       | Get one session's messages    |
-| DELETE | `/api/v1/chat-sessions/{id}`       | Delete a chat session         |
+| Method | Endpoint                       | Description                |
+| ------ | ------------------------------ | -------------------------- |
+| GET    | `/api/v1/chat-sessions`        | List your chat sessions    |
+| GET    | `/api/v1/chat-sessions/search` | Search your chat history   |
+| GET    | `/api/v1/chat-sessions/{id}`   | Get one session's messages |
+| DELETE | `/api/v1/chat-sessions/{id}`   | Delete a chat session      |
 
 ## Documents
 
-| Method | Endpoint                             | Description                    |
-| ------ | -------------------------------------- | -------------------------------- |
-| POST   | `/api/v1/documents/upload`           | Upload a PDF                    |
-| POST   | `/api/v1/documents/manual-entry`     | Submit a loan application form  |
-| GET    | `/api/v1/documents`                  | List your documents             |
-| GET    | `/api/v1/documents/{filename}/download` | Download a document          |
-| DELETE | `/api/v1/documents/{filename}`       | Delete a document                |
-| GET    | `/api/v1/documents/search`           | Semantic search                  |
-| GET    | `/api/v1/documents/ask`              | Ask a question (chat)            |
+| Method | Endpoint                                | Description                    |
+| ------ | --------------------------------------- | ------------------------------ |
+| POST   | `/api/v1/documents/upload`              | Upload a PDF                   |
+| POST   | `/api/v1/documents/manual-entry`        | Submit a loan application form |
+| GET    | `/api/v1/documents`                     | List your documents            |
+| GET    | `/api/v1/documents/{filename}/download` | Download a document            |
+| DELETE | `/api/v1/documents/{filename}`          | Delete a document              |
+| GET    | `/api/v1/documents/search`              | Semantic search                |
+| GET    | `/api/v1/documents/ask`                 | Ask a question (chat)          |
 
 ## Banking Intelligence
 
-| Method | Endpoint                             | Description                  |
-| ------ | -------------------------------------- | ------------------------------ |
-| GET    | `/api/v1/documents/summary`          | Document summary                |
-| GET    | `/api/v1/documents/risk-assessment`  | Loan risk assessment             |
-| GET    | `/api/v1/documents/compliance-check` | Compliance analysis              |
-| GET    | `/api/v1/documents/analyze`          | Executive banking analysis       |
+| Method | Endpoint                             | Description                |
+| ------ | ------------------------------------ | -------------------------- |
+| GET    | `/api/v1/documents/summary`          | Document summary           |
+| GET    | `/api/v1/documents/risk-assessment`  | Loan risk assessment       |
+| GET    | `/api/v1/documents/compliance-check` | Compliance analysis        |
+| GET    | `/api/v1/documents/analyze`          | Executive banking analysis |
 
 All endpoints above require a Bearer JWT except signup/login.
 
