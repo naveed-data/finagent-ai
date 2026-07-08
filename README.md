@@ -27,6 +27,18 @@ Every account only ever sees its own documents and conversations — enforced at
 
 ---
 
+# 🖼 Screenshots
+
+**Home — conversational AI dashboard**
+
+![FinAgent AI homepage](docs/screenshots/homepage.png)
+
+**System architecture**
+
+![System architecture diagram](docs/screenshots/architecture-diagram.png)
+
+---
+
 # ✨ Features
 
 ## 🔐 Authentication & Multi-Tenancy
